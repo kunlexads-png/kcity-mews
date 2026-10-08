@@ -1,0 +1,6 @@
+{
+  "name": "KCity Mews - Step In. Stand Out.",
+  "description": "Modern online fashion store specializing in premium shoes and statement T-shirts with secure checkout, Paystack payments, and full order management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
