@@ -140,9 +140,11 @@ export async function verifyPayment(req: Request, res: Response) {
     }
 
     // Send order confirmation email
-    emailService.sendOrderConfirmationEmail(order, itemsRes.rows).catch((err) => {
-      console.error('[Email Confirmation Error]:', err);
-    });
+    emailService
+  .sendOrderConfirmationEmail(order, itemsRes.rows)
+  .catch((err: unknown) => {
+    console.error('[Order Confirmation Email Error]:', err);
+  });
 
     const updatedOrderRes = await db.query('SELECT * FROM orders WHERE id = $1', [order.id]);
 
