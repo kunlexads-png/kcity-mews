@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Lock, Mail, User, Phone, ArrowRight, Loader2, CheckCircle, MailCheck, ShieldCheck } from 'lucide-react';
+import {
+  Lock,
+  Mail,
+  User,
+  Phone,
+  ArrowRight,
+  Loader2,
+  MailCheck,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { useToast } from '../../context/ToastContext.tsx';
 
@@ -12,7 +20,7 @@ export function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registeredSuccess, setRegisteredSuccess] = useState(false);
-  const [devToken, setDevToken] = useState<string | null>(null);
+  
 
   const { register } = useAuth();
   const { error } = useToast();
@@ -37,18 +45,15 @@ export function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      const res = await register({
-        fullName,
-        email,
-        phone,
-        password,
-        confirmPassword,
-      });
+      await register({
+  fullName,
+  email,
+  phone,
+  password,
+  confirmPassword,
+});
 
-      setRegisteredSuccess(true);
-      if (res.devVerificationToken) {
-        setDevToken(res.devVerificationToken);
-      }
+setRegisteredSuccess(true);
     } catch {
       // Handled in auth context
     } finally {
@@ -76,24 +81,7 @@ export function RegisterPage() {
             Please click the button inside the email to verify your email address and activate your KCity Mews account.
           </p>
 
-          {devToken && (
-            <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-3">
-              <div className="flex items-center gap-1.5 font-bold uppercase text-[10px] tracking-widest text-emerald-400">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Dev Preview Simulator</span>
-              </div>
-              <p className="text-slate-300 text-xs">
-                Since you are developing locally, you can click the button below to verify your email instantly:
-              </p>
-              <Link
-                to={`/verify-email?token=${devToken}`}
-                className="inline-flex items-center justify-center gap-2 w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-colors"
-              >
-                <CheckCircle className="w-4 h-4" />
-                <span>Verify Email Now (1-Click)</span>
-              </Link>
-            </div>
-          )}
+          
 
           <div className="pt-2 flex flex-col gap-2">
             <Link
