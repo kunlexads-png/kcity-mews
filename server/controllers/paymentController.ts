@@ -1,10 +1,17 @@
 import { Request, Response } from 'express';
+import { AuthenticatedRequest } from '../middleware/auth.ts';
 import { db } from '../database/db.ts';
 import { paystackService } from '../services/paystackService.ts';
 import { emailService } from '../services/emailService.ts';
 
-export async function initializePayment(req: Request, res: Response) {
+export async function initializePayment(req: AuthenticatedRequest, res: Response) {
   try {
+        if (!req.user || req.user.role !== 'customer') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only signed-in customers can make payments.',
+      });
+    }
     const { reference, orderId, email } = req.body;
 
     let orderQuery = '';
@@ -27,6 +34,13 @@ export async function initializePayment(req: Request, res: Response) {
 
     const order = orderRes.rows[0];
 
+// A customer can only pay for their own order
+if (String(order.user_id) !== String(req.user.userId)) {
+  return res.status(403).json({
+    success: false,
+    message: 'You are not authorized to pay for this order.',
+  });
+}
     const customerEmail = email || order.customer_email;
     const amount = Number(order.total_amount);
 
@@ -70,7 +84,8 @@ export async function verifyPayment(req: Request, res: Response) {
       return res.status(404).json({ success: false, message: 'Order not found for reference: ' + reference });
     }
 
-    const order = orderRes.rows[0];
+        const order = orderRes.rows[0];
+
 
     // Already marked as paid - return idempotent response
     if (order.payment_status === 'Paid') {

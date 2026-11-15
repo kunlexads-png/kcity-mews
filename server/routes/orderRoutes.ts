@@ -1,3 +1,4 @@
+
 import { Router } from 'express';
 import {
   createOrder,
@@ -6,17 +7,17 @@ import {
   getAllOrders,
   updateOrderStatus,
 } from '../controllers/orderController.ts';
-import { authenticate, optionalAuth, requireAdmin } from '../middleware/auth.ts';
+import { authenticate, requireAdmin } from '../middleware/auth.ts';
 
 const router = Router();
 
-// Checkout creates order
-router.post('/', optionalAuth, createOrder);
+// Only authenticated customers can create orders
+router.post('/', authenticate, createOrder);
 
-// Customer gets own orders
+// Customer gets their own orders
 router.get('/my-orders', authenticate, getCustomerOrders);
 
-// View specific order by ID or order number or ref
+// View specific order by ID, order number or reference
 router.get('/lookup/:identifier', getOrderByIdOrRef);
 
 // Admin order routes

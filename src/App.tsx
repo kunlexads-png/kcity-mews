@@ -4,7 +4,8 @@ import { ToastProvider } from './context/ToastContext.tsx';
 import { AuthProvider } from './context/AuthContext.tsx';
 import { CartProvider } from './context/CartContext.tsx';
 import { WishlistProvider } from './context/WishlistContext.tsx';
-
+import { useLocation } from 'react-router-dom';
+import { useAuth } from './context/AuthContext.tsx';
 import { Navbar } from './components/layout/Navbar.tsx';
 import { Footer } from './components/layout/Footer.tsx';
 import { DevEmailDrawer } from './components/common/DevEmailDrawer.tsx';
@@ -50,7 +51,36 @@ function StorefrontLayout() {
     </div>
   );
 }
+function CustomerCheckoutGuard() {
+  const { user, isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-sm font-bold text-slate-600">
+          Checking your account...
+        </p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: location }}
+        replace
+      />
+    );
+  }
+
+  if (user?.role !== 'customer') {
+    return <Navigate to="/" replace />;
+  }
+
+  return <CheckoutPage />;
+}
 export default function App() {
   return (
     <ThemeProvider>
@@ -66,7 +96,10 @@ export default function App() {
                     <Route path="/shop" element={<ShopPage />} />
                     <Route path="/product/:id" element={<ProductDetailPage />} />
                     <Route path="/cart" element={<CartPage />} />
-                    <Route path="/checkout" element={<CheckoutPage />} />
+                    <Route
+  path="/checkout"
+  element={<CustomerCheckoutGuard />}
+/>
                     <Route path="/payment-success" element={<PaymentSuccessPage />} />
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/contact" element={<ContactPage />} />

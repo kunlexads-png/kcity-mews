@@ -5,6 +5,12 @@ import { emailService } from '../services/emailService.ts';
 
 export async function createOrder(req: AuthenticatedRequest, res: Response) {
   try {
+        if (!req.user || req.user.role !== 'customer') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only signed-in customer accounts can place orders.',
+      });
+    }
     const {
       fullName,
       email,
